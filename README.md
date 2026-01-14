@@ -4,7 +4,7 @@ Jet-rocket in space. 6 ship models that the user can fly, swap, clone.
 
 Another version of my spaceship projects, building on "github repo upld 5L05+; spaceship-animation-5L1", and "github repo upld 5L28; spaceship-4way-swap-5L1", amoung other versions.
 
-Published web-link: https://25sep02.github.io/rockets_in_orbit-(fly_swap_clone)6a1/
+Published web-link: https://25sep02.github.io/rockets_in_orbit-fly_swap_clone-6a1/
 
 === Summary:
 
