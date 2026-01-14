@@ -1,0 +1,213 @@
+
+=== Notes in reverse date order
+
+-- summary/pointers for key content below:
+
+=== Summary:
+
+> When started the app shows a start screen with basic usage info:
+
+    Click logo to start.
+
+    -- In spaceship scene:
+       [G] - Change type of spaceship.
+       [D] = move ahead while held
+       [F,R] = rocket thrust Fwd,Rev
+       [T] = turn to face opposite way
+       [W,S] = spin left, right
+       [up,dn-arrow] = grow, shrink
+       [left,right-arrow] = rotate left, right
+       [spacebar] = rotate stop'
+       [N] = 1-30 ship clone NPCs, 20sec fly-away
+
+> The 6 ship models that the user can swap to with the 'G' key are: 1)spaceship; 2)spaceship_no-flare; 3)xwing; 4)xwing_no-flare; 5)tiefiter (as in tie-fighter); 6)tiefiter_no-flare.
+
+
+> A key design point was to streamline the code with one single on-screen "sprite_1" that flexes to show all spaceship movements and animations and spaceship types.
+   All animations are played on sprite_1.
+   All directional positions and angles are applied to sprite_1 for all movements.
+   Swapping spaceship types is done by setting source images as textures on sprite_1.
+   All spaceship types have 4 possible animations: engine_flare, rotate, turn-left, turn-right.
+   Four new custom 'animaiton-name properties' were added to sprite_1, one each for each of the 4 possible animations. As each spaceship type has its "texture" source image set on sprite_1 the animation-script names associated with each spaceship type are also loaded into the matching 'animaiton-name properties'.
+
+
+> This also allows new spaceship types to be added with minimum code changes:
+
+** Create the digital graphics:
+  - create new spaceship 'basic' & 'rotate' image and sprite-sheet files
+  - put the new image and sprite-sheet files in the project's images folder
+
+** Update the game project's code (copy/paste/customize from existing ship-type code):
+  - load the images (as "textures") in the "preload()" section
+  - add 4 named animation-scripts (engine_flare, rotate, turn-left, turn-right)
+  - in type swap code of 'G' key listener add a new section to setup the new spaceship
+
+
+----------------------------------------
+
+>> 6a09: "1-30 NPC clones" feature add.
+
+Copy the "1-30 NPC clones" feature into the updated "spaceship swap v2 prj 2026" project.
+
+Add new 'N' (as in 'NPC' or 'New') user input key and add the key listener for 'N' with the feature code in the listener.
+
+When 'N' is pressed an 'NPC' clone of the "current ship-type" (is rocket, xwing, tiefiter) flies on screen and stops at a random location. After 20 seconds the 'NPC' clone flies of screen and is deleted by the code. There is a max limit of 30 NPC clones on screen at one time.
+
+I added the block of code for 'N-npc' after the L/R-arrow keys listeners for 'Rotate' and before the Up/Dn-arrow keys listeners for 'Resize'.
+
+The feature source code came from the earlier project: "spaceship-anim-5L1 Keolot-project ".
+   (The path at the time of use was: '/Users/philipmackenzie/Documents/Phil/z; misc; gnrl/- BBEdit dev-utils Golly +/vsc webdev/game engines - general; 5k1/z1 - Keolot Phaser Editor - js game builder 5k29/spaceship-anim-5L1 Keolot-project ')
+
+
+
+----------------------------------------
+
+>> 6a07: Add Tie-Fighter (Tiefiter) spaceship type to the project.
+
+New sprite-sheets:
+   tiefiter_no-flare.png
+   tiefiter_rotate.png
+   tiefiter.png
+
+Because the tiefiter is identical front and back, the rotate ssheet could be only 6-cells for a half-rotate (which is also a 'turn'), and loop twice to get the full rotation effect. BUT - On rotate and then stop, the other animations use 12 frames an 'stop' goes to the end. I made the tiefiter rotate anim 12 cells so the look is consistent. The rotate anim also needed to reflect 12 cells.
+   This also means that the left-turn and right-turn animations are identical as 1 shot passes through cells 1 thru 5. <<-- NOTE: Frames in the sprite-sheet (ss) are counted from 0.
+   In rotate-ss frame 0 is the side view. The turn begins with the side view from the previous anim ('cruise'-ss) so we skip the duplicate frame that starts the rotate.
+   This also smooths the look of the transition when going from one animation to the another. The doubled side views from the end of one ss and the start of the other could highlight any slight alignment differences between the animations.
+
+
+*** Sprite-sheet design issue:  ***
+
+The 3-cell tiefighter sprite-sheet ('ss' or 'ssheet') has ship on right and exhaust on left. The project code flips the ss on turn but the half-rotate ss keeps the ship on the right. There is an 80px difference that the ship snaps across at the end of the turn.
+
+The above also causes glitched or skewed appearances for the spin and resize code functions.
+
+The only fix is to stick with the original and simple code design of the project and instead to make sure that for any ship its cruise, rotate, and similar, sprite-sheets/textures are roughly centered in the 176px wide sprite-sheet/texture cells.
+
+If the images in the cells are not centered then all orientation changes are skewed by the asymetry. While 'move' is ok, other changes are oddly skewed, including: turn, resize, spin. Any ship specific code hacks would be extensive. Any generic design changes, like 'setOrigin' or putting sprite_1 in a container or centering the main image in the sprite and using some sort of 'attachment' for things like exhaust flares, are to complex and difficult to implement for a simple project like this.
+
+*** I implemented changes to sprite-sheets 'tiefiter' (3-cell with exhaust), 'tiefiter_no-flare' (3-cell no ehaust flare), and 'tiefiter_rotate' (6-cell 1/2 rotate, since tf front and back are identical just loop for full rotation).
+   I shrank the cell images just enough so I could center the tiefiter in each cell frame with the exhaust still fitting behind it. While this made the tiefiter images a bit smaller, in the javascritp+phaser game code I already had a 'sprite_1.setScale' setting for all ship-types being swapped in with the 'G' key listener. I set this a bit larger for the tiefiter ssheets/textures than I did for the other ship-types to offset for the size reduction of the centered tiefiter ssheet images.
+
+
+     -     -     -     -     -     -     -     -     -
+
+New sprite-sheets:
+   tiefiter_no-flare.png
+   tiefiter_rotate.png
+   tiefiter.png
+
+Because the tiefiter is identical front and back, the rotate ssheet is only 6-cells for a half-rotate (which is also a 'turn'). It needs to loop twice to get the full rotation effect.
+   This also means that the left-turn and right-turn animations are identical as 1 shot passes through cells 1 thru 5. <<-- NOTE: Frames in the sprite-sheet (ss) are counted from 0. In rotate-ss frame 0 is the side view. The turn begins with the side view from the previous anim ('cruise'-ss) so we skip the duplicate looking from that starts the rotate. This also improves the look from one animation to the other. The doubled side views from the end of one ss and the start of the other could highlight any slight alignment differences between the animations.
+
+"tiefiter_alt.png" is an alternate engine exhaust look in case I want to exchange exhaust animation looks.
+
+In project scene_B:
+ - add sprite-sheets load in preload() method
+ - copy xwing anim-scripts and edit for tiefiter
+ - add new swap code to 'G' key listener
+
+
+
+
+>> 6a05a: Added full info-text on start-up screen. Fixed known code issues.
+
+Features include:
+ - swap spaceship types
+ - D-move
+ - F/R-accel/decel
+ - rotate
+ - turn
+ - spin cw/ccw
+ - resize
+ - bkgrnd-RtoL/LtoR
+
+
+>> 6a04c (ref "src; tmp bkp 6a04-2221 (ship swap code - draft).zip"):
+
+Added ship swap with 'G' key feature.
+
+
+
+>> 6a04b (ref "src; tmp bkp 6a04-1547.zip"): Specifically for "sprite reuse prj 6a2":
+
+Added features from the 'multi-sprite spaceship 4-way swap' project.
+
+All features added except swap. Features added include: spin, bkgrnd-RtoL/LtoR, D-move, F/R-accel/decel, resize, turn, rotate.
+
+-- Issue: Do: start, turn, left-arrow rotate - ship flips to right facing right and does a right-arrow rotate instead of a left-arrow rotate.
+
+
+
+>> 6a04a: Specifically for "sprite reuse prj 6a2":
+
+Added features from the 'multi-sprite spaceship 4-way swap' project.
+
+All features added except rotate and swap. Features added include: spin, bkgrnd-RtoL/LtoR, D-move, F/R-accel/decel, resize, turn.
+
+
+
+
+
+>> 6a03:
+
+-- Complete 'phaser starter project 6a1'.
+   - Model 'index.html' file for modular javascript code.
+   - Source 'src' folder with 'main.js' code for project config and initialize.
+   - All scenes in '\src\scenes\' folder.
+   - Start-up 'scene_A' with image and text and a 'click to start' prompt.
+   - Main 'scene_B' with image, sprite, sound, and animation.
+   - '\assets\' folder with all audio, image, sprite sheet source files.
+
+
+-- Source content used to begin this project (from ...\webdev\main 2\) include:
+   > [- phaser launcher starter (+ ai js alt) 5L12]
+   > [spaceship js 2026a]
+
+Also content from: [phaser; spaceship sprite reuse fail (v6a02)]
+
+
+-- Below is copied a section of file "- phaser; spaceship sprite reuse fail (v6a02).txt" that explains the initial idea of this project:
+
+[Folder: "zz; 6a02 remove 'ss_turn' drafts - fail"]
+
+Partial progress made refactoring code to remove 'sprite_ss_turn_left' and '...right' sprites.
+
+All versions are partial refactorings with glitches and issues in turn/rotate/swap/etc code.
+
+I concluded it would be better and easier to start with a new project:
+ - Have just a generic "sprite1" used for all rocket/xwing flare/noFlare tiefiter etc textures.
+ - Add custom properties '.anim01', '.anim02', etc to "sprite1".
+   Eg: '.anim01' holds the anim01 script name ('anim key') from the code.
+   The anim-script has the spritesheet 'texture' name 'preloaded' in the phaser project.
+   When an anim plays on a sprite its texture replaces any previous texture set on the sprite.
+
+ - Do 'sprite1.setTexture' to set any given image-file 'texture' for static image display.
+
+ - Do eg "sprite1.play('sprite1.anim01')" to show any given animation animation that may be set in the '.anim01' custom property.
+
+ - Only do multiple sprites when more that 1 is on screen at the same time.
+
+ - Swapping textures/animations on a sprite (like 'pick you race car' in a racing game) is straight forward in this setup.
+
+
+
+
+----------------------------------------
+
+
+
+
+
+----------------------------------------
+
+
+
+
+
+----------------------------------------
+
+
+
+
+
+

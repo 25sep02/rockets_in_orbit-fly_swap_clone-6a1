@@ -1,0 +1,23 @@
+import { scene_A } from './scenes/scene_A.js';
+import { scene_B } from './scenes/scene_B.js';
+
+const config = {
+    type: Phaser.AUTO,
+    title: 'Generic Sprite',
+    description: '',
+    parent: 'game-container',
+    width: 1280,
+    height: 720,
+    backgroundColor: '#000000',
+    pixelArt: false,
+    scene: [
+        scene_A,
+        scene_B
+    ],
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+}
+
+new Phaser.Game(config);
